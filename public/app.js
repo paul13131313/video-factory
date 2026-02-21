@@ -56,6 +56,9 @@ lineAvatarBtn.addEventListener('click', () => {
         headers: { 'Content-Type': file.type },
         body: file,
       });
+      if (!res.ok) {
+        throw new Error(`サーバーエラー: ${res.status}`);
+      }
       const result = await res.json();
       lineAvatarUrl = result.url;
       lineAvatarPreview.src = result.url;
@@ -351,6 +354,9 @@ function triggerImageUpload(messageIndex) {
         headers: { 'Content-Type': file.type },
         body: file,
       });
+      if (!res.ok) {
+        throw new Error(`サーバーエラー: ${res.status}`);
+      }
       const result = await res.json();
       messages[messageIndex].artifact.url = result.url;
       messages[messageIndex].artifact.title = messages[messageIndex].artifact.title || file.name;
@@ -452,12 +458,14 @@ function handleProgress(data) {
   if (data.stage === 'error') {
     showError(data.message);
     generateBtn.disabled = false;
+    currentJobId = null;
     return;
   }
 
   if (data.stage === 'done') {
     showDownload(data);
     generateBtn.disabled = false;
+    currentJobId = null;
     return;
   }
 

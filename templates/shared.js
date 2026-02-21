@@ -114,9 +114,11 @@ async function runConversation(conversation, timing, callbacks) {
         // Puppeteer側にアーティファクト情報を通知して待機
         window.__ARTIFACT_PENDING = msg.artifact;
         window.__WAITING_FOR_ARTIFACT = true;
-        // Puppeteerが処理するまで待つ
-        while (window.__WAITING_FOR_ARTIFACT) {
+        // Puppeteerが処理するまで待つ（60秒タイムアウト付き）
+        let artifactTimeout = 0;
+        while (window.__WAITING_FOR_ARTIFACT && artifactTimeout < 600) {
           await sleep(100);
+          artifactTimeout++;
         }
       }
     }

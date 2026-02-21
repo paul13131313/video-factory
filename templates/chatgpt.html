@@ -389,7 +389,7 @@
   const sendBtn = document.getElementById('sendBtn');
   const typingIndicator = document.getElementById('typingIndicator');
 
-  window.__START_ANIMATION = async function(conversation, timing) {
+  window.__START_ANIMATION = async function(conversation, timing, settings) {
     const callbacks = {
       onUserType: async (text, charDelay) => {
         await typeIntoInput(inputBox, sendBtn, text, charDelay);

@@ -73,7 +73,7 @@ const AI_CONFIGS = {
       scrollDuration: 0,
       endPause: 0,
     },
-    artifactTypes: [],
+    artifactTypes: ['image'],
     durationCorrection: 1.1,
   },
 };

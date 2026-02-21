@@ -471,7 +471,7 @@
   const fullscreenTitle = document.getElementById('fullscreenTitle');
 
   // Puppeteerから呼ばれるアニメーション開始関数
-  window.__START_ANIMATION = async function(conversation, timing) {
+  window.__START_ANIMATION = async function(conversation, timing, settings) {
     const callbacks = {
       // ユーザータイピング
       onUserType: async (text, charDelay) => {

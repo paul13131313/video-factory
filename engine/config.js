@@ -22,6 +22,7 @@ const AI_CONFIGS = {
       endPause: 1500,
     },
     artifactTypes: ['website'],
+    durationCorrection: 1.21,
   },
 
   chatgpt: {
@@ -48,6 +49,7 @@ const AI_CONFIGS = {
       imageRevealDuration: 800,
     },
     artifactTypes: ['image', 'website'],
+    durationCorrection: 1.21,
   },
 
   line: {
@@ -72,10 +74,11 @@ const AI_CONFIGS = {
       endPause: 0,
     },
     artifactTypes: [],
+    durationCorrection: 1.1,
   },
 };
 
-// ベースのアニメーション時間を計算（速度倍率の算出用）
+// ベースのアニメーション時間を計算
 function calculateBaseAnimationTime(conversation, baseTiming) {
   let totalMs = baseTiming.startPause;
   for (const msg of conversation) {
@@ -93,10 +96,15 @@ function calculateBaseAnimationTime(conversation, baseTiming) {
 }
 
 // 速度倍率を適用したタイミングを生成
+// 実測補正: テンプレート内のsleep・CSSトランジション・Puppeteerオーバーヘッドにより
+// 実際の動画はスケーリング計算値より長くなる。
+// 2点の実測データから線形補間でAI別の補正係数を導出。
+// correctedBase方式: speedMultiplier = (baseTime × correction) / targetDuration
 function calculateTiming(conversation, aiConfig, targetDuration) {
   const baseTiming = aiConfig.timing;
   const baseTime = calculateBaseAnimationTime(conversation, baseTiming);
-  const speedMultiplier = baseTime / targetDuration;
+  const correction = aiConfig.durationCorrection || 1.2;
+  const speedMultiplier = (baseTime * correction) / targetDuration;
 
   return {
     userTypePerChar: baseTiming.userTypePerChar / speedMultiplier,

@@ -1,0 +1,563 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #111;
+  color: #ddd;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== ヘッダー ===== */
+.app-header {
+  padding: 12px 24px;
+  background: #0a0a0a;
+  border-bottom: 1px solid #222;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.app-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+}
+
+/* AI セレクター（ヘッダー内） */
+.ai-selector {
+  display: flex;
+  gap: 4px;
+}
+
+.ai-option input[type="radio"] {
+  display: none;
+}
+
+.ai-chip {
+  display: block;
+  padding: 6px 14px;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #999;
+  transition: all 0.15s ease;
+}
+
+.ai-chip:hover {
+  border-color: #444;
+  color: #ccc;
+}
+
+.ai-option input[type="radio"]:checked + .ai-chip {
+  border-color: #D97757;
+  background: #1a1410;
+  color: #D97757;
+}
+
+.ai-chip.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* 尺設定（ヘッダー内） */
+.header-setting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.header-setting label {
+  font-size: 12px;
+  color: #666;
+}
+
+.header-setting input[type="range"] {
+  width: 100px;
+  accent-color: #D97757;
+}
+
+.setting-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  min-width: 36px;
+}
+
+/* ===== メインレイアウト ===== */
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 会話エディタ（全幅） */
+.editor-area {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.editor-toolbar {
+  padding: 10px 20px;
+  background: #0e0e0e;
+  border-bottom: 1px solid #1e1e1e;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.editor-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-tool {
+  font-size: 11px;
+  color: #888;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-tool:hover {
+  border-color: #555;
+  color: #ccc;
+}
+
+.editor-content {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+/* ===== 会話メッセージリスト ===== */
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.msg-item {
+  background: #181818;
+  border: 1px solid #282828;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.msg-item.msg-item-user {
+  border-left: 3px solid #D97757;
+}
+
+.msg-item.msg-item-assistant {
+  border-left: 3px solid #6B8AFF;
+}
+
+.msg-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  background: #141414;
+}
+
+.msg-item-role {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.msg-item-user .msg-item-role {
+  color: #D97757;
+}
+
+.msg-item-assistant .msg-item-role {
+  color: #6B8AFF;
+}
+
+.msg-item-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.msg-item-actions button {
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 13px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.msg-item-actions button:hover {
+  color: #ccc;
+  background: #252525;
+}
+
+.msg-item-actions button.btn-delete:hover {
+  color: #ff5555;
+  background: #2a1515;
+}
+
+/* メッセージテキスト入力 */
+.msg-item-body {
+  padding: 10px 14px;
+}
+
+.msg-item-text {
+  width: 100%;
+  background: #0e0e0e;
+  border: 1px solid #252525;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #e8e8e8;
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  min-height: 56px;
+  transition: border-color 0.15s;
+}
+
+.msg-item-text:focus {
+  border-color: #444;
+  background: #121212;
+}
+
+.msg-item-text::placeholder {
+  color: #555;
+}
+
+/* アーティファクト設定 */
+.artifact-toggle {
+  padding: 4px 14px 10px;
+}
+
+.artifact-toggle-btn {
+  background: none;
+  border: 1px dashed #333;
+  color: #555;
+  cursor: pointer;
+  padding: 7px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+  width: 100%;
+  transition: all 0.15s;
+}
+
+.artifact-toggle-btn:hover {
+  border-color: #555;
+  color: #888;
+}
+
+.artifact-toggle-btn.active {
+  border-style: solid;
+  border-color: #6B8AFF;
+  color: #6B8AFF;
+  background: #0f1428;
+}
+
+.artifact-fields {
+  padding: 0 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.artifact-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.artifact-field label {
+  font-size: 11px;
+  color: #666;
+  min-width: 50px;
+}
+
+.artifact-field input {
+  flex: 1;
+  background: #0e0e0e;
+  border: 1px solid #252525;
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #e0e0e0;
+  font-size: 13px;
+  outline: none;
+}
+
+.artifact-field input:focus,
+.artifact-field select:focus {
+  border-color: #444;
+}
+
+/* 画像アップロード */
+.artifact-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.artifact-upload-btn {
+  width: 100%;
+  padding: 20px;
+  background: #141414;
+  border: 2px dashed #333;
+  border-radius: 10px;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.artifact-upload-btn:hover {
+  border-color: #6B8AFF;
+  color: #6B8AFF;
+  background: #0f1428;
+}
+
+.artifact-preview {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+/* メッセージ追加ボタン */
+.add-message-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-bottom: 16px;
+}
+
+.btn-add {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: 1px dashed #333;
+  border-radius: 10px;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-add:hover {
+  border-color: #D97757;
+  color: #D97757;
+  background: #1a1410;
+}
+
+/* ===== LINE設定パネル ===== */
+.line-settings {
+  padding: 10px 20px;
+  background: #0e0e0e;
+  border-bottom: 1px solid #1e1e1e;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.line-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.line-settings-label {
+  font-size: 11px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.line-settings-input {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  padding: 5px 10px;
+  color: #e0e0e0;
+  font-size: 13px;
+  outline: none;
+  width: 120px;
+}
+
+.line-settings-input:focus {
+  border-color: #444;
+}
+
+.line-avatar-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.line-avatar-preview {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #333;
+}
+
+/* ===== JSON エディタ ===== */
+.json-editor {
+  width: 100%;
+  background: #0e0e0e;
+  border: 1px solid #252525;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #ccc;
+  resize: vertical;
+  outline: none;
+  tab-size: 2;
+}
+
+.json-editor:focus {
+  border-color: #444;
+}
+
+.json-error {
+  font-size: 12px;
+  color: #ff5555;
+  padding: 4px 20px;
+  min-height: 0;
+}
+
+/* ===== 生成フッター（画面下部固定） ===== */
+.generate-footer {
+  flex-shrink: 0;
+  padding: 12px 24px;
+  background: #0a0a0a;
+  border-top: 1px solid #222;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-generate {
+  padding: 12px 32px;
+  background: #D97757;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-generate:hover {
+  background: #c4654a;
+}
+
+.btn-generate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* フッター内ステータス */
+.footer-status {
+  flex: 1;
+  min-width: 0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #222;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #D97757;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.progress-message {
+  font-size: 12px;
+  color: #888;
+}
+
+
+/* エラー（インライン） */
+.error-title-inline {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ff5555;
+  margin-right: 8px;
+}
+
+.error-message {
+  font-size: 12px;
+  color: #888;
+}
+
+/* ===== レスポンシブ ===== */
+@media (max-width: 768px) {
+  .header-controls {
+    flex-wrap: wrap;
+  }
+  .generate-footer {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+  }
+  .btn-generate {
+    width: 100%;
+    justify-content: center;
+  }
+}

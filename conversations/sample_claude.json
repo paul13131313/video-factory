@@ -1,0 +1,15 @@
+[
+  {
+    "role": "user",
+    "text": "パーティクルが画面中を飛び回るやつ作って。WebGPUで100万個くらい"
+  },
+  {
+    "role": "assistant",
+    "text": "WebGPU Compute Shaderで100万パーティクルのシミュレーションを作りました！\n\nマウスで引力・斥力を操作できます。パーティクルの速度に応じて色が変わるようにしてあります。",
+    "artifact": {
+      "type": "website",
+      "title": "Particle Storm",
+      "url": "https://paul13131313.github.io/particle-storm/"
+    }
+  }
+]

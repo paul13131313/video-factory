@@ -1,0 +1,15 @@
+[
+  {
+    "role": "user",
+    "text": "沖縄のビーチの絵を描いて。水彩画みたいなタッチで"
+  },
+  {
+    "role": "assistant",
+    "text": "沖縄のビーチを水彩画風に描きました。透明感のある海とヤシの木、白い砂浜をやわらかいタッチで表現しています。",
+    "artifact": {
+      "type": "image",
+      "title": "沖縄ビーチ水彩画",
+      "url": "/samples/chatgpt-image.svg"
+    }
+  }
+]

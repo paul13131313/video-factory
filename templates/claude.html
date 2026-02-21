@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>Claude Chat</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    width: 390px;
+    height: 844px;
+    overflow: hidden;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', system-ui, -apple-system, sans-serif;
+    background: #FAF9F5;
+    display: flex;
+    flex-direction: column;
+    color: #141413;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== ヘッダー ===== */
+  .header {
+    height: 48px;
+    background: #FAF9F5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .header-back {
+    position: absolute;
+    left: 12px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-back svg {
+    width: 20px;
+    height: 20px;
+    stroke: #6B6A65;
+    fill: none;
+  }
+
+  .header-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #141413;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .header-title-chevron {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    vertical-align: middle;
+    margin-left: 4px;
+    stroke: #6B6A65;
+    fill: none;
+  }
+
+  .header-share {
+    position: absolute;
+    right: 12px;
+    font-size: 12px;
+    color: #6B6A65;
+    border: 1px solid #D9D8D2;
+    border-radius: 8px;
+    padding: 4px 10px;
+    background: #FFFFFF;
+  }
+
+  /* ===== チャットエリア ===== */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .chat-area::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ===== ユーザーメッセージ ===== */
+  .msg-user {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .msg-user.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .msg-user-bubble {
+    max-width: 85%;
+    padding: 10px 16px;
+    background: #F0EEE6;
+    color: #141413;
+    border-radius: 12px;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  /* ===== アシスタントメッセージ ===== */
+  .msg-assistant {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .msg-assistant.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .msg-assistant-text {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.5;
+    color: #141413;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding: 0 8px 0 4px;
+  }
+
+  /* ===== タイピングインジケーター（アスタリスク回転） ===== */
+  .typing-indicator {
+    display: none;
+    padding: 4px 0;
+  }
+
+  .typing-indicator.visible {
+    display: block;
+  }
+
+  .typing-spinner {
+    width: 28px;
+    height: 28px;
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* ===== 入力エリア ===== */
+  .input-area {
+    padding: 8px 8px 20px;
+    flex-shrink: 0;
+  }
+
+  .input-container {
+    background: #FFFFFF;
+    border-radius: 20px;
+    box-shadow:
+      0 4px 20px rgba(0, 0, 0, 0.035),
+      0 0 0 0.5px rgba(31, 30, 29, 0.15);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .input-top {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px 8px;
+    gap: 8px;
+  }
+
+  .input-box {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    color: #141413;
+    outline: none;
+  }
+
+  .input-box::placeholder {
+    color: #A3A29B;
+  }
+
+  .input-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 10px 10px;
+  }
+
+  .input-plus {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .input-plus svg {
+    width: 20px;
+    height: 20px;
+    stroke: #6B6A65;
+    fill: none;
+  }
+
+  .input-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .input-model {
+    font-size: 11px;
+    color: #A3A29B;
+    letter-spacing: -0.01em;
+  }
+
+  .send-btn {
+    width: 32px;
+    height: 32px;
+    background: #141413;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+
+  .send-btn.active {
+    opacity: 1;
+  }
+
+  .send-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ===== アーティファクトカード ===== */
+  .artifact-card {
+    margin-top: 12px;
+    background: #FFFFFF;
+    border: 1px solid #E5E4DE;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+  }
+
+  .artifact-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .artifact-card-icon {
+    width: 36px;
+    height: 36px;
+    background: #F0EEE6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .artifact-card-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: #6B6A65;
+    fill: none;
+  }
+
+  .artifact-card-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .artifact-card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #141413;
+    line-height: 1.3;
+  }
+
+  .artifact-card-type {
+    font-size: 12px;
+    color: #A3A29B;
+    margin-top: 2px;
+  }
+
+  .artifact-card-arrow {
+    width: 20px;
+    height: 20px;
+    stroke: #A3A29B;
+    fill: none;
+    flex-shrink: 0;
+  }
+
+  /* ===== フルスクリーンオーバーレイ ===== */
+  .fullscreen-overlay {
+    position: fixed;
+    inset: 0;
+    background: #FFFFFF;
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fullscreen-overlay.visible {
+    transform: translateY(0);
+  }
+
+  .fullscreen-header {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-bottom: 1px solid #E5E4DE;
+    flex-shrink: 0;
+    gap: 12px;
+  }
+
+  .fullscreen-back {
+    width: 24px;
+    height: 24px;
+    stroke: #141413;
+    fill: none;
+  }
+
+  .fullscreen-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #141413;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fullscreen-content {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .fullscreen-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* ===== フッター ===== */
+  .footer-note {
+    text-align: center;
+    font-size: 11px;
+    color: #A3A29B;
+    padding: 0 16px 8px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<div class="header">
+  <div class="header-back">
+    <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M4 4h7a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z"/><path d="M15 4h5a1 1 0 011 1v14a1 1 0 01-1 1h-5a1 1 0 01-1-1V5a1 1 0 011-1z"/></svg>
+  </div>
+  <span class="header-title">
+    新しいチャット
+    <svg class="header-title-chevron" viewBox="0 0 24 24" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </span>
+  <div class="header-share">共有</div>
+</div>
+
+<!-- チャットエリア -->
+<div class="chat-area" id="chatArea">
+  <div class="typing-indicator" id="typingIndicator">
+    <svg class="typing-spinner" viewBox="0 0 100 100" fill="none">
+      <line x1="50" y1="8" x2="50" y2="28" stroke="#D97757" stroke-width="6" stroke-linecap="round"/>
+      <line x1="50" y1="72" x2="50" y2="92" stroke="#D97757" stroke-width="6" stroke-linecap="round"/>
+      <line x1="8" y1="50" x2="28" y2="50" stroke="#D97757" stroke-width="6" stroke-linecap="round"/>
+      <line x1="72" y1="50" x2="92" y2="50" stroke="#D97757" stroke-width="6" stroke-linecap="round"/>
+      <line x1="20.3" y1="20.3" x2="34.4" y2="34.4" stroke="#D97757" stroke-width="6" stroke-linecap="round"/>
+      <line x1="65.6" y1="65.6" x2="79.7" y2="79.7" stroke="#D97757" stroke-width="6" stroke-linecap="round"/>
+      <line x1="20.3" y1="79.7" x2="34.4" y2="65.6" stroke="#D97757" stroke-width="6" stroke-linecap="round"/>
+      <line x1="65.6" y1="34.4" x2="79.7" y2="20.3" stroke="#D97757" stroke-width="6" stroke-linecap="round"/>
+    </svg>
+  </div>
+</div>
+
+<!-- 入力エリア -->
+<div class="input-area">
+  <div class="input-container">
+    <div class="input-top">
+      <input class="input-box" id="inputBox" type="text" placeholder="メッセージを入力..." readonly>
+    </div>
+    <div class="input-bottom">
+      <div class="input-plus">
+        <svg viewBox="0 0 24 24" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </div>
+      <div class="input-right">
+        <span class="input-model">Opus 4.6</span>
+        <button class="send-btn" id="sendBtn">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- フッター -->
+<div class="footer-note">Claude は AI のため、誤りを含む可能性があります。回答内容は必ずご確認ください。</div>
+
+<!-- フルスクリーンオーバーレイ -->
+<div class="fullscreen-overlay" id="fullscreenOverlay">
+  <div class="fullscreen-header">
+    <svg class="fullscreen-back" viewBox="0 0 24 24" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <span class="fullscreen-title" id="fullscreenTitle"></span>
+  </div>
+  <div class="fullscreen-content" id="fullscreenContent"></div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+  // DOM要素の参照
+  const chatArea = document.getElementById('chatArea');
+  const inputBox = document.getElementById('inputBox');
+  const sendBtn = document.getElementById('sendBtn');
+  const typingIndicator = document.getElementById('typingIndicator');
+  const overlay = document.getElementById('fullscreenOverlay');
+  const fullscreenTitle = document.getElementById('fullscreenTitle');
+
+  // Puppeteerから呼ばれるアニメーション開始関数
+  window.__START_ANIMATION = async function(conversation, timing) {
+    const callbacks = {
+      // ユーザータイピング
+      onUserType: async (text, charDelay) => {
+        await typeIntoInput(inputBox, sendBtn, text, charDelay);
+      },
+
+      // ユーザーメッセージ送信
+      onUserSend: async (text) => {
+        await sendUserBubble(inputBox, sendBtn, chatArea, typingIndicator, text);
+      },
+
+      // タイピングインジケーター表示
+      onAssistantIndicator: async (duration) => {
+        showIndicator(typingIndicator);
+        scrollToBottom(chatArea);
+        await sleep(duration);
+      },
+
+      // アシスタントメッセージストリーミング
+      onAssistantStream: async (text, charDelay) => {
+        hideIndicator(typingIndicator);
+        const row = document.createElement('div');
+        row.className = 'msg-assistant';
+        const textEl = document.createElement('div');
+        textEl.className = 'msg-assistant-text';
+        row.appendChild(textEl);
+        chatArea.insertBefore(row, typingIndicator);
+        row.classList.add('visible');
+        scrollToBottom(chatArea);
+        await streamText(textEl, chatArea, text, charDelay);
+      },
+
+      // アーティファクトカード表示
+      onArtifactCard: async (artifact, timing) => {
+        // 最後のアシスタントメッセージ行を取得
+        const rows = chatArea.querySelectorAll('.msg-assistant');
+        const lastRow = rows[rows.length - 1];
+
+        // アーティファクトカードを作成
+        const card = document.createElement('div');
+        card.className = 'artifact-card';
+        card.innerHTML = createArtifactCardHTML(artifact.title, 'Webサイト');
+        lastRow.appendChild(card);
+        scrollToBottom(chatArea);
+        await sleep(50);
+        card.classList.add('visible');
+        scrollToBottom(chatArea);
+        await sleep(timing.artifactCardPause);
+
+        // フルスクリーンオーバーレイをスライドアップ
+        fullscreenTitle.textContent = artifact.title;
+        overlay.classList.add('visible');
+        await sleep(timing.artifactTransition);
+      },
+    };
+
+    await runConversation(conversation, timing, callbacks);
+  };
+
+  // 準備完了通知
+  window.__CHAT_READY = true;
+</script>
+
+</body>
+</html>

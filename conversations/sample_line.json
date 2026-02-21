@@ -1,0 +1,28 @@
+{
+  "settings": {
+    "lineName": "まさき",
+    "lineAvatar": "/samples/line-avatar.svg"
+  },
+  "conversation": [
+    {
+      "role": "assistant",
+      "text": "明日のランチどこにする？"
+    },
+    {
+      "role": "user",
+      "text": "うーん、イタリアンとかどう？"
+    },
+    {
+      "role": "assistant",
+      "text": "いいね！駅前に新しくできたパスタ屋さん気になってたんだよね"
+    },
+    {
+      "role": "user",
+      "text": "あそこか！じゃあ12時に現地集合で"
+    },
+    {
+      "role": "assistant",
+      "text": "おっけ！楽しみ〜"
+    }
+  ]
+}

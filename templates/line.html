@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>LINE</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    width: 390px;
+    height: 844px;
+    overflow: hidden;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', system-ui, -apple-system, sans-serif;
+    background: #7494C0;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== ヘッダー ===== */
+  .header {
+    height: 56px;
+    background: #6B8BB5;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    flex-shrink: 0;
+    gap: 12px;
+  }
+
+  .header-back {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-back svg {
+    width: 22px;
+    height: 22px;
+    stroke: #fff;
+    fill: none;
+  }
+
+  .header-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #4A6D94;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .header-avatar svg {
+    width: 18px;
+    height: 18px;
+    fill: #fff;
+  }
+
+  .header-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .header-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-icon svg {
+    width: 22px;
+    height: 22px;
+    stroke: #fff;
+    fill: none;
+  }
+
+  /* ===== チャットエリア ===== */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .chat-area::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 日付ラベル */
+  .date-label {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    padding: 8px 0;
+  }
+
+  /* ===== ユーザーメッセージ（右側・緑） ===== */
+  .msg-user {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .msg-user.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .msg-user-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+    flex-shrink: 0;
+  }
+
+  .msg-read {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1;
+  }
+
+  .msg-time {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1;
+  }
+
+  .msg-user-bubble {
+    max-width: 70%;
+    padding: 10px 14px;
+    background: #8CE26B;
+    color: #000;
+    border-radius: 18px 18px 4px 18px;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  /* ===== アシスタントメッセージ（左側・白） ===== */
+  .msg-assistant {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .msg-assistant.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .msg-assistant-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #4A6D94;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .msg-assistant-avatar svg {
+    width: 20px;
+    height: 20px;
+    fill: #fff;
+  }
+
+  .msg-assistant-content {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    max-width: 75%;
+  }
+
+  .msg-assistant-bubble {
+    padding: 10px 14px;
+    background: #fff;
+    color: #000;
+    border-radius: 18px 18px 18px 4px;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .msg-assistant-time {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  /* ===== 画像メッセージ ===== */
+  .msg-assistant-image {
+    border-radius: 14px;
+    max-width: 200px;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .msg-assistant-image.loaded {
+    opacity: 1;
+  }
+
+  /* ===== タイピングインジケーター ===== */
+  .typing-indicator {
+    display: none;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 0;
+  }
+
+  .typing-indicator.visible {
+    display: flex;
+  }
+
+  .typing-indicator-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #4A6D94;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .typing-indicator-avatar svg {
+    width: 20px;
+    height: 20px;
+    fill: #fff;
+  }
+
+  .typing-bubble {
+    background: #fff;
+    border-radius: 18px 18px 18px 4px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .typing-bubble span {
+    width: 7px;
+    height: 7px;
+    background: #aaa;
+    border-radius: 50%;
+    animation: lineDot 1.2s ease-in-out infinite;
+  }
+
+  .typing-bubble span:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  .typing-bubble span:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  @keyframes lineDot {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+  }
+
+  /* ===== 入力エリア ===== */
+  .input-area {
+    background: #fff;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .input-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .input-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: #888;
+  }
+
+  .input-box {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', system-ui, sans-serif;
+    font-size: 15px;
+    color: #333;
+    outline: none;
+    background: #fff;
+  }
+
+  .input-box::placeholder {
+    color: #bbb;
+  }
+
+  .send-btn {
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+
+  .send-btn.active {
+    opacity: 1;
+  }
+
+  .send-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* ===== ホームインジケーター ===== */
+  .home-indicator {
+    height: 24px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .home-indicator-bar {
+    width: 134px;
+    height: 5px;
+    background: #000;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<div class="header">
+  <div class="header-back">
+    <svg viewBox="0 0 24 24" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
+  </div>
+  <div class="header-center">
+    <div class="header-avatar">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/></svg>
+    </div>
+    <span class="header-name" id="headerName">AI</span>
+  </div>
+  <div class="header-actions">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+    </div>
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" stroke-width="1.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- チャットエリア -->
+<div class="chat-area" id="chatArea">
+  <div class="date-label" id="dateLabel"></div>
+  <div class="typing-indicator" id="typingIndicator">
+    <div class="typing-indicator-avatar">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/></svg>
+    </div>
+    <div class="typing-bubble">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</div>
+
+<!-- 入力エリア -->
+<div class="input-area">
+  <div class="input-icon">
+    <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" fill="none" stroke="#888" stroke-width="1.5"/><circle cx="12" cy="13" r="4" fill="none" stroke="#888" stroke-width="1.5"/></svg>
+  </div>
+  <input class="input-box" id="inputBox" type="text" placeholder="Aa" readonly>
+  <button class="send-btn" id="sendBtn">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13" stroke="#06C755" stroke-width="2" stroke-linecap="round"/><path d="M22 2L15 22l-4-9-9-4L22 2z" stroke="#06C755" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+</div>
+
+<!-- ホームインジケーター -->
+<div class="home-indicator">
+  <div class="home-indicator-bar"></div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+  const chatArea = document.getElementById('chatArea');
+  const inputBox = document.getElementById('inputBox');
+  const sendBtn = document.getElementById('sendBtn');
+  const typingIndicator = document.getElementById('typingIndicator');
+  const dateLabel = document.getElementById('dateLabel');
+
+  // 現在時刻を取得（表示用）
+  function getCurrentTime() {
+    const now = new Date();
+    return `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+  }
+
+  // 日付ラベルを設定
+  const now = new Date();
+  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  dateLabel.textContent = `${now.getMonth() + 1}月${now.getDate()}日(${days[now.getDay()]})`;
+
+  // デフォルトの人物アイコンSVG
+  const PERSON_SVG = `<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/></svg>`;
+
+  // アバター要素を生成（画像URLがある場合はimg、なければSVG）
+  function createAvatarContent(avatarUrl) {
+    if (avatarUrl) {
+      return `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    }
+    return PERSON_SVG;
+  }
+
+  window.__START_ANIMATION = async function(conversation, timing, settings) {
+    settings = settings || {};
+    const timeStr = getCurrentTime();
+
+    // 名前とアバターを設定
+    const headerName = document.getElementById('headerName');
+    headerName.textContent = settings.lineName || 'AI';
+
+    const avatarUrl = settings.lineAvatar || '';
+
+    // ヘッダーアバター
+    const headerAvatar = document.querySelector('.header-avatar');
+    headerAvatar.innerHTML = createAvatarContent(avatarUrl);
+
+    // タイピングインジケーターのアバター
+    const typingAvatar = document.querySelector('.typing-indicator-avatar');
+    typingAvatar.innerHTML = createAvatarContent(avatarUrl);
+
+    const callbacks = {
+      // ユーザータイピング
+      onUserType: async (text, charDelay) => {
+        await typeIntoInput(inputBox, sendBtn, text, charDelay);
+      },
+
+      // ユーザーメッセージ送信
+      onUserSend: async (text) => {
+        inputBox.value = '';
+        sendBtn.classList.remove('active');
+
+        const row = document.createElement('div');
+        row.className = 'msg-user';
+
+        // 既読 + 時刻（左側）
+        const meta = document.createElement('div');
+        meta.className = 'msg-user-meta';
+        const read = document.createElement('span');
+        read.className = 'msg-read';
+        read.textContent = '既読';
+        const time = document.createElement('span');
+        time.className = 'msg-time';
+        time.textContent = timeStr;
+        meta.appendChild(read);
+        meta.appendChild(time);
+        row.appendChild(meta);
+
+        // バブル（右側）
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-user-bubble';
+        bubble.textContent = text;
+        row.appendChild(bubble);
+
+        chatArea.insertBefore(row, typingIndicator);
+        await sleep(50);
+        row.classList.add('visible');
+        scrollToBottom(chatArea);
+      },
+
+      // タイピングインジケーター表示
+      onAssistantIndicator: async (duration) => {
+        showIndicator(typingIndicator);
+        scrollToBottom(chatArea);
+        await sleep(duration);
+      },
+
+      // アシスタントメッセージ（一括表示、ストリーミングなし）
+      onAssistantStream: async (text, charDelay) => {
+        hideIndicator(typingIndicator);
+
+        const row = document.createElement('div');
+        row.className = 'msg-assistant';
+
+        // アバター
+        const avatar = document.createElement('div');
+        avatar.className = 'msg-assistant-avatar';
+        avatar.innerHTML = createAvatarContent(avatarUrl);
+        row.appendChild(avatar);
+
+        // バブル + 時刻
+        const content = document.createElement('div');
+        content.className = 'msg-assistant-content';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-assistant-bubble';
+        bubble.textContent = text;
+        content.appendChild(bubble);
+
+        const time = document.createElement('span');
+        time.className = 'msg-assistant-time';
+        time.textContent = timeStr;
+        content.appendChild(time);
+
+        row.appendChild(content);
+        chatArea.insertBefore(row, typingIndicator);
+        await sleep(50);
+        row.classList.add('visible');
+        scrollToBottom(chatArea);
+      },
+
+      // 画像アーティファクト（LINEの画像メッセージ）
+      onArtifactCard: async (artifact, timing) => {
+        if (artifact.type === 'image') {
+          hideIndicator(typingIndicator);
+
+          const row = document.createElement('div');
+          row.className = 'msg-assistant';
+
+          const avatar = document.createElement('div');
+          avatar.className = 'msg-assistant-avatar';
+          avatar.innerHTML = createAvatarContent(avatarUrl);
+          row.appendChild(avatar);
+
+          const content = document.createElement('div');
+          content.className = 'msg-assistant-content';
+
+          const img = document.createElement('img');
+          img.className = 'msg-assistant-image';
+          img.src = artifact.url;
+          img.alt = artifact.title || '';
+          content.appendChild(img);
+
+          const time = document.createElement('span');
+          time.className = 'msg-assistant-time';
+          time.textContent = timeStr;
+          content.appendChild(time);
+
+          row.appendChild(content);
+          chatArea.insertBefore(row, typingIndicator);
+          await sleep(50);
+          row.classList.add('visible');
+
+          // 画像ロード後にフェードイン
+          await new Promise((resolve) => {
+            img.onload = () => {
+              img.classList.add('loaded');
+              scrollToBottom(chatArea);
+              resolve();
+            };
+            img.onerror = resolve;
+            setTimeout(resolve, 5000);
+          });
+
+          await sleep(500);
+          scrollToBottom(chatArea);
+        }
+      },
+    };
+
+    await runConversation(conversation, timing, callbacks);
+  };
+
+  window.__CHAT_READY = true;
+</script>
+
+</body>
+</html>

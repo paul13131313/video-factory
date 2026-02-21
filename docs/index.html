@@ -220,6 +220,37 @@ body {
   background: #c4654a;
 }
 
+.first-time {
+  margin-top: 40px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.first-time-toggle {
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  text-align: center;
+  list-style: none;
+  transition: color 0.15s;
+}
+
+.first-time-toggle:hover {
+  color: #888;
+}
+
+.first-time-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.first-time-toggle::before {
+  content: '▸ ';
+}
+
+.first-time[open] .first-time-toggle::before {
+  content: '▾ ';
+}
+
 .footer {
   margin-top: 48px;
   font-size: 12px;
@@ -261,34 +292,26 @@ body {
     <span class="skin-chip">LINE</span>
   </div>
 
+  <!-- 2回目以降（メイン導線） -->
   <div class="setup">
     <div class="setup-header">
       <span class="setup-header-dot"></span>
-      <span class="setup-header-title">セットアップ</span>
+      <span class="setup-header-title">使い方</span>
     </div>
     <div class="setup-body">
       <ol class="setup-steps">
         <li class="step">
           <span class="step-num">1</span>
           <div class="step-content">
-            <div class="step-title">リポジトリをクローン</div>
-            <div class="step-code" onclick="copyCode(this)">git clone https://github.com/paul13131313/video-factory.git</div>
+            <div class="step-title">ターミナルで起動</div>
+            <div class="step-code" onclick="copyCode(this)">cd ~/dev/movie-edit && node server.js</div>
           </div>
         </li>
         <li class="step">
           <span class="step-num">2</span>
           <div class="step-content">
-            <div class="step-title">依存パッケージをインストール</div>
-            <div class="step-code" onclick="copyCode(this)">cd video-factory && npm install</div>
-            <div class="step-note">※ Node.js 18+ と FFmpeg が必要です</div>
-          </div>
-        </li>
-        <li class="step">
-          <span class="step-num">3</span>
-          <div class="step-content">
-            <div class="step-title">起動</div>
-            <div class="step-code" onclick="copyCode(this)">node server.js</div>
-            <div class="step-desc">起動したら下のボタンからアクセスできます。</div>
+            <div class="step-title">ブラウザで開く</div>
+            <div class="step-desc">下のボタンからアクセスできます。</div>
           </div>
         </li>
       </ol>
@@ -296,6 +319,36 @@ body {
   </div>
 
   <a href="http://localhost:3000" class="open-btn" target="_blank">localhost:3000 を開く →</a>
+
+  <!-- 初回セットアップ -->
+  <details class="first-time">
+    <summary class="first-time-toggle">初回セットアップはこちら</summary>
+    <div class="setup" style="margin-top: 16px;">
+      <div class="setup-header">
+        <span class="setup-header-dot" style="background: #666;"></span>
+        <span class="setup-header-title">初回のみ</span>
+      </div>
+      <div class="setup-body">
+        <ol class="setup-steps">
+          <li class="step">
+            <span class="step-num">1</span>
+            <div class="step-content">
+              <div class="step-title">リポジトリをクローン</div>
+              <div class="step-code" onclick="copyCode(this)">git clone https://github.com/paul13131313/video-factory.git ~/dev/movie-edit</div>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num">2</span>
+            <div class="step-content">
+              <div class="step-title">依存パッケージをインストール</div>
+              <div class="step-code" onclick="copyCode(this)">cd ~/dev/movie-edit && npm install</div>
+              <div class="step-note">※ Node.js 18+ と FFmpeg が必要です</div>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </details>
 
   <p class="footer">
     <a href="https://github.com/paul13131313/video-factory" target="_blank">GitHub</a>

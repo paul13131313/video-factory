@@ -19,8 +19,11 @@ async function startRecording({ jobId, aiType, conversation, settings, onProgres
 
     const timing = calculateTiming(conversation, aiConfig);
 
+    const t0 = Date.now();
+    const lap = (label) => console.log(`[${jobId}] ${label}: ${((Date.now() - t0) / 1000).toFixed(1)}s`);
+
     onProgress('init', 5, 'ブラウザ起動中...');
-    console.log(`[${jobId}] AI: ${aiConfig.name}`);
+    lap('開始');
 
     const launchOptions = {
       headless: true,
@@ -35,6 +38,7 @@ async function startRecording({ jobId, aiType, conversation, settings, onProgres
       launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
     }
     browser = await puppeteer.launch(launchOptions);
+    lap('ブラウザ起動');
 
     const page = await browser.newPage();
     await page.setViewport({
@@ -48,13 +52,13 @@ async function startRecording({ jobId, aiType, conversation, settings, onProgres
     const templatePath = path.join(TEMPLATES_DIR, aiConfig.template);
     await page.goto(`file://${templatePath}`, { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__CHAT_READY === true, { timeout: 10000 });
-    console.log(`[${jobId}] テンプレート準備完了`);
+    lap('テンプレート準備完了');
 
     // 録画開始
     onProgress('recording', 20, '録画開始...');
     const webmPath = path.join(OUTPUT_DIR, `${jobId}.webm`);
     const recorder = await page.screencast({ path: webmPath });
-    console.log(`[${jobId}] 録画開始`);
+    lap('録画開始');
 
     // ローカルパスをfile://に変換するヘルパー
     const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
@@ -172,16 +176,17 @@ async function startRecording({ jobId, aiType, conversation, settings, onProgres
     // 録画停止
     onProgress('stopping', 75, '録画停止中...');
     await recorder.stop();
-    console.log(`[${jobId}] 録画停止`);
+    lap('録画停止');
 
     await browser.close();
     browser = null;
+    lap('ブラウザ終了');
 
     // WebM → MP4 変換
     onProgress('converting', 80, 'MP4変換中...');
     const outputPath = path.join(OUTPUT_DIR, `${jobId}.mp4`);
     execSync(
-      `ffmpeg -y -i "${webmPath}" -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30 -an "${outputPath}"`,
+      `ffmpeg -y -i "${webmPath}" -c:v libx264 -preset ultrafast -crf 20 -pix_fmt yuv420p -r 30 -an "${outputPath}"`,
       { stdio: 'pipe' }
     );
 
@@ -190,7 +195,7 @@ async function startRecording({ jobId, aiType, conversation, settings, onProgres
       `ffprobe -v error -show_entries format=duration -of csv=p=0 "${outputPath}"`
     ).toString().trim();
     const duration = parseFloat(durationStr);
-    console.log(`[${jobId}] 出力: ${outputPath} (${duration.toFixed(1)}秒)`);
+    lap(`完了 (${duration.toFixed(1)}秒動画)`);
 
     // 中間ファイル削除
     fs.unlinkSync(webmPath);

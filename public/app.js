@@ -1,6 +1,4 @@
 // ===== DOM要素 =====
-const targetDurationSlider = document.getElementById('targetDuration');
-const durationValue = document.getElementById('durationValue');
 const messageList = document.getElementById('messageList');
 const conversationJson = document.getElementById('conversationJson');
 const jsonError = document.getElementById('jsonError');
@@ -75,11 +73,6 @@ lineAvatarClear.addEventListener('click', () => {
   lineAvatarUrl = '';
   lineAvatarPreview.style.display = 'none';
   lineAvatarClear.style.display = 'none';
-});
-
-// スライダー
-targetDurationSlider.addEventListener('input', () => {
-  durationValue.textContent = `${targetDurationSlider.value}秒`;
 });
 
 // サンプル読み込み（AIタイプ別）
@@ -482,9 +475,8 @@ generateBtn.addEventListener('click', async () => {
   }
 
   const aiType = document.querySelector('input[name="aiType"]:checked').value;
-  const targetDuration = parseInt(targetDurationSlider.value);
 
-  const settings = { targetDuration };
+  const settings = {};
 
   // LINE固有設定
   if (aiType === 'line') {

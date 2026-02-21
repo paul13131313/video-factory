@@ -17,11 +17,10 @@ async function startRecording({ jobId, aiType, conversation, settings, onProgres
       throw new Error(`未対応のAIタイプ: ${aiType}`);
     }
 
-    const targetDuration = (settings && settings.targetDuration) || 15;
-    const timing = calculateTiming(conversation, aiConfig, targetDuration);
+    const timing = calculateTiming(conversation, aiConfig);
 
     onProgress('init', 5, 'ブラウザ起動中...');
-    console.log(`[${jobId}] AI: ${aiConfig.name}, 速度倍率: ${timing.speedMultiplier.toFixed(2)}x`);
+    console.log(`[${jobId}] AI: ${aiConfig.name}`);
 
     const launchOptions = {
       headless: true,

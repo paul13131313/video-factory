@@ -1,27 +1,26 @@
 // AI別設定オブジェクト
 // タイミング値はそのまま使われる（速度倍率なし）
-// SNS向けのスピーディーなテンポに設定済み
 const AI_CONFIGS = {
   claude: {
     name: 'Claude',
     template: 'claude.html',
     viewport: { width: 390, height: 844 },
     timing: {
-      userTypePerChar: 25,      // ユーザー入力: 1文字25ms（速めのタイピング）
-      preSendPause: 200,        // 送信前の間
-      postSendPause: 300,       // 送信後 → AI表示までの間
-      assistIndicator: 400,     // 「考え中...」表示時間
-      assistTypePerChar: 10,    // AI返答ストリーミング: 1文字10ms
-      postAssistPause: 400,     // AI返答後の間
-      startPause: 300,          // 動画開始時の間
-      endPause: 800,            // 動画終了時の間
+      userTypePerChar: 35,      // ユーザー入力: 1文字35ms
+      preSendPause: 300,        // 送信前の間
+      postSendPause: 500,       // 送信後 → AI表示までの間
+      assistIndicator: 600,     // 「考え中...」表示時間
+      assistTypePerChar: 15,    // AI返答ストリーミング: 1文字15ms
+      postAssistPause: 600,     // AI返答後の間
+      startPause: 500,          // 動画開始時の間
+      endPause: 1200,           // 動画終了時の間
     },
     artifact: {
-      cardPause: 600,
-      transition: 400,
-      loadWait: 1000,
+      cardPause: 1200,          // アーティファクトカード表示後の間（長めに）
+      transition: 500,
+      loadWait: 1200,
       scrollDuration: 4000,
-      endPause: 1000,
+      endPause: 1200,
     },
     artifactTypes: ['website'],
   },
@@ -31,21 +30,21 @@ const AI_CONFIGS = {
     template: 'chatgpt.html',
     viewport: { width: 390, height: 844 },
     timing: {
-      userTypePerChar: 25,
-      preSendPause: 200,
-      postSendPause: 300,
-      assistIndicator: 400,
-      assistTypePerChar: 10,
-      postAssistPause: 400,
-      startPause: 300,
-      endPause: 800,
+      userTypePerChar: 35,
+      preSendPause: 300,
+      postSendPause: 500,
+      assistIndicator: 600,
+      assistTypePerChar: 15,
+      postAssistPause: 600,
+      startPause: 500,
+      endPause: 1200,
     },
     artifact: {
-      cardPause: 600,
-      transition: 400,
+      cardPause: 800,
+      transition: 500,
       loadWait: 1500,
       scrollDuration: 4000,
-      endPause: 1000,
+      endPause: 1200,
       imageLoadDelay: 1500,
       imageRevealDuration: 600,
     },
@@ -57,14 +56,14 @@ const AI_CONFIGS = {
     template: 'line.html',
     viewport: { width: 390, height: 844 },
     timing: {
-      userTypePerChar: 25,
-      preSendPause: 200,
-      postSendPause: 300,
-      assistIndicator: 300,
+      userTypePerChar: 35,
+      preSendPause: 300,
+      postSendPause: 500,
+      assistIndicator: 500,
       assistTypePerChar: 0,     // LINEは即時表示
-      postAssistPause: 400,
-      startPause: 300,
-      endPause: 800,
+      postAssistPause: 600,
+      startPause: 500,
+      endPause: 1200,
     },
     artifact: {
       cardPause: 0,

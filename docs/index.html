@@ -203,6 +203,23 @@ body {
   color: #555;
 }
 
+.open-btn {
+  display: inline-block;
+  margin-top: 32px;
+  padding: 14px 36px;
+  background: #D97757;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.open-btn:hover {
+  background: #c4654a;
+}
+
 .footer {
   margin-top: 48px;
   font-size: 12px;
@@ -271,12 +288,14 @@ body {
           <div class="step-content">
             <div class="step-title">起動</div>
             <div class="step-code" onclick="copyCode(this)">node server.js</div>
-            <div class="step-desc">ブラウザで <strong>http://localhost:3000</strong> を開いて使えます。</div>
+            <div class="step-desc">起動したら下のボタンからアクセスできます。</div>
           </div>
         </li>
       </ol>
     </div>
   </div>
+
+  <a href="http://localhost:3000" class="open-btn" target="_blank">localhost:3000 を開く →</a>
 
   <p class="footer">
     <a href="https://github.com/paul13131313/video-factory" target="_blank">GitHub</a>

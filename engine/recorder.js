@@ -27,6 +27,7 @@ async function startRecording({ jobId, aiType, conversation, settings, onProgres
 
     const launchOptions = {
       headless: true,
+      protocolTimeout: 60000,
       args: [
         `--window-size=${aiConfig.viewport.width},${aiConfig.viewport.height}`,
         '--no-sandbox',
@@ -120,18 +121,12 @@ async function startRecording({ jobId, aiType, conversation, settings, onProgres
           // Webサイトアーティファクト: ページ遷移 + スクロール
           onProgress('artifact', 50, `サイト読み込み中: ${artifact.title}`);
 
-          await page.goto(artifact.url, { waitUntil: 'networkidle2', timeout: 15000 });
-          await sleep(timing.artifactLoadWait);
-
-          // 画像の読み込みを待つ
-          await page.evaluate(async () => {
-            await new Promise(r => setTimeout(r, 1000));
-            const images = document.querySelectorAll('img');
-            await Promise.all([...images].map(img => {
-              if (img.complete) return Promise.resolve();
-              return new Promise(r => { img.onload = r; img.onerror = r; });
-            }));
-          });
+          try {
+            await page.goto(artifact.url, { waitUntil: 'networkidle2', timeout: 15000 });
+          } catch (e) {
+            console.log(`[${jobId}] ページ読み込みタイムアウト、続行: ${e.message}`);
+          }
+          await sleep(timing.artifactLoadWait + 2000);
 
           // 自動スクロール
           onProgress('scrolling', 60, 'スクロール中...');
@@ -143,20 +138,17 @@ async function startRecording({ jobId, aiType, conversation, settings, onProgres
           });
 
           if (scrollHeight > 0) {
-            const duration = Math.max(3000, Math.min(timing.artifactScrollDuration, scrollHeight * 5));
-            const totalSteps = Math.ceil(scrollHeight);
-            const delayPerStep = duration / totalSteps;
+            const scrollStep = Math.max(2, Math.ceil(scrollHeight / 300));
+            const duration = Math.max(3000, Math.min(timing.artifactScrollDuration, 8000));
+            const steps = Math.ceil(scrollHeight / scrollStep);
+            const delayPerStep = duration / steps;
 
-            console.log(`[${jobId}] スクロール: ${scrollHeight}px, ${(duration / 1000).toFixed(1)}秒`);
+            console.log(`[${jobId}] スクロール: ${scrollHeight}px, ${steps}ステップ, ${(duration / 1000).toFixed(1)}秒`);
 
-            await page.evaluate(async (totalScroll, delay) => {
-              let pos = 0;
-              while (pos < totalScroll) {
-                pos = Math.min(pos + 1, totalScroll);
-                window.scrollTo(0, pos);
-                await new Promise(r => setTimeout(r, delay));
-              }
-            }, scrollHeight, delayPerStep);
+            for (let pos = 0; pos < scrollHeight; pos += scrollStep) {
+              await page.evaluate((y) => window.scrollTo(0, y), Math.min(pos, scrollHeight));
+              await sleep(delayPerStep);
+            }
           }
 
           await sleep(timing.artifactEndPause);

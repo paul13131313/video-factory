@@ -120,7 +120,7 @@ async function startRecording({ jobId, aiType, conversation, settings, onProgres
           // Webサイトアーティファクト: ページ遷移 + スクロール
           onProgress('artifact', 50, `サイト読み込み中: ${artifact.title}`);
 
-          await page.goto(artifact.url, { waitUntil: 'networkidle0', timeout: 30000 });
+          await page.goto(artifact.url, { waitUntil: 'networkidle2', timeout: 15000 });
           await sleep(timing.artifactLoadWait);
 
           // 画像の読み込みを待つ

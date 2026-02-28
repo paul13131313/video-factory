@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 4000;
 const CONVERSATIONS_DIR = path.join(__dirname, 'conversations');
 const OUTPUT_DIR = path.join(__dirname, 'output');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
